@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:fontFamily="@font/pretendard_medium"
-            android:text="DALL-E 2\nIMAGE EDIT PROJECT"
+            android:text="DALL-E 2\nIMAGE GENERATE PROJECT"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
@@ -58,7 +58,6 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <LinearLayout
-
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
