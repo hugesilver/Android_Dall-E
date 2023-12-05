@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
@@ -18,14 +19,18 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    fun postDall_E(translatedText: String) {
-        var intent = Intent(this, ReturnActivity::class.java)
+    private fun showToast(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        toast.show()
+    }
+
+    private fun postDall_E(translatedText: String) {
+        val intent = Intent(this, ReturnActivity::class.java)
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.openai.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -33,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         val service = retrofit.create(DallEService::class.java)
 
-        service.postDallE(DallERequest(translatedText, 8, "256x256"))
+        service.postDallE(DallERequest("dall-e-2", translatedText, 8, "256x256"))
             .enqueue(object : Callback<ResultDallEImages> {
                 override fun onResponse(
                     call: Call<ResultDallEImages>,
@@ -56,34 +61,26 @@ class MainActivity : AppCompatActivity() {
                             binding.loading.visibility = View.GONE
                         } catch (e: JSONException) {
                             Log.e("Error", e.toString())
-                            Toast.makeText(
-                                this@MainActivity,
-                                "이미지 출력 중 실패: $e",
-                                Toast.LENGTH_LONG
-                            )
+                            showToast("이미지 출력 중 실패: $e")
                             binding.loading.visibility = View.GONE
                         }
                     } else {
                         // 통신이 실패한 경우(응답코드 3xx, 4xx 등)
                         Log.d("Result", "Dall-E onResponse 실패: " + response.code())
-                        Toast.makeText(
-                            this@MainActivity,
-                            "이미지 생성 중 실패하였습니다: ${response.code()}",
-                            Toast.LENGTH_LONG
-                        )
+                        showToast("이미지 생성 중 실패하였습니다: ${response.code()}")
                         binding.loading.visibility = View.GONE
                     }
                 }
 
                 override fun onFailure(call: Call<ResultDallEImages>, t: Throwable) {
-                    Log.d("Result", "Dall-E onFailure: " + t.toString());
-                    Toast.makeText(this@MainActivity, "이미지 생성 중 실패하였습니다: ${t}", Toast.LENGTH_LONG)
+                    Log.d("Result", "Dall-E onFailure: $t")
+                    showToast("이미지 생성 중 실패하였습니다: $t")
                     binding.loading.visibility = View.GONE
                 }
             })
     }
 
-    fun postPapago(text: String) {
+    private fun postPapago(text: String) {
         binding.editText.text.clear()
         binding.loading.visibility = View.VISIBLE
         val retrofit = Retrofit.Builder()
@@ -101,23 +98,19 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         // 정상적으로 통신이 성공된 경우
-                        Log.d("Result", "Papago onResponse 성공: " + response.raw().toString());
+                        Log.d("Result", "Papago onResponse 성공: " + response.raw().toString())
                         postDall_E(response.body()!!.message.result.translatedText)
                     } else {
                         // 통신이 실패한 경우(응답코드 3xx, 4xx 등)
                         Log.d("Result", "Papago onResponse 실패: " + response.code())
-                        Toast.makeText(
-                            this@MainActivity,
-                            "번역 중 실패하였습니다: ${response.code()}",
-                            Toast.LENGTH_LONG
-                        )
+                        showToast("번역 중 실패하였습니다: ${response.code()}")
                         binding.loading.visibility = View.GONE
                     }
                 }
 
                 override fun onFailure(call: Call<ResultTransferPapago>, t: Throwable) {
-                    Log.d("Result", "Papago onFailure: " + t.toString())
-                    Toast.makeText(this@MainActivity, "번역 중 실패하였습니다: ${t}", Toast.LENGTH_LONG)
+                    Log.d("Result", "Papago onFailure: $t")
+                    showToast("번역 중 실패하였습니다: $t")
                     binding.loading.visibility = View.GONE
                 }
             })

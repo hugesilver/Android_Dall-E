@@ -21,6 +21,7 @@ data class ResultDallEImages (
 )
 
 data class DallERequest(
+    val model: String,
     val prompt: String,
     val n: Int,
     val size: String
