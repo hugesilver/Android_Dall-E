@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         val service = retrofit.create(DallEService::class.java)
 
-        service.postDallE(DallERequest("dall-e-2", translatedText, 8, "256x256"))
+        service.postDallE(DallERequest("dall-e-2", translatedText, 5, "256x256"))
             .enqueue(object : Callback<ResultDallEImages> {
                 override fun onResponse(
                     call: Call<ResultDallEImages>,
